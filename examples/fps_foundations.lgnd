@@ -1,0 +1,20 @@
+// Fundamentos de um FPS 3D em Legend Script
+auto player = spawn("Player");
+auto camera = spawn("MainCamera");
+auto weapon = spawn("Rifle");
+
+add_component(player, "CharacterController");
+add_component(player, "Health(100)");
+add_component(weapon, "HitscanWeapon");
+
+auto start = vec3(0, 1.8, 0);
+auto rotation = quat(0, 0, 0, 1);
+auto scale = vec3(1, 1, 1);
+auto player_transform = transform(start, rotation, scale);
+set_transform(player, player_transform);
+translate(player, vec3(0, 0, -3));
+
+output(player);
+output(player_transform);
+output("entities=" + entity_count());
+yield(0.016); // ponto de suspensão do frame

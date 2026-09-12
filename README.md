@@ -1,24 +1,22 @@
 # Legend Script
 
-**Legend Script** (ou **Legend**) é uma linguagem de script experimental para jogos, com arquivos `.lgnd`. O projeto começa com uma sintaxe familiar a C/C++ e um runtime pequeno, preparando o caminho para gameplay, entidades, matemática vetorial e integração com engines.
+**Legend Script** (ou **Legend**) é uma linguagem de gameplay para jogos 2D e 3D. Ela foi desenhada para combinar a facilidade de criação esperada por equipes indie com os recursos de runtime, determinismo e desempenho necessários em produções AAA. Arquivos Legend usam a extensão `.lgnd`.
 
-> Este repositório é uma implementação original. O fluxo de build foi inspirado no padrão público do [Terlang](https://github.com/terroo/terlang): CMake, C++23, executável instalável em `bin`, REPL e execução com `-e`.
+A ambição do projeto é tornar o código de jogo mais direto que C++, sem abandonar uma base capaz de crescer para compilação nativa, ferramentas profissionais, multiplayer, física, renderização e IA local. A Legend não tenta ser apenas uma camada de scripts: ela está sendo construída como uma plataforma completa de desenvolvimento de jogos.
+
+> O repositório é uma implementação original. O fluxo de build segue o padrão público do [Terlang](https://github.com/terroo/terlang): CMake, C++23, executável instalável em `bin`, REPL e execução com `-e`.
 
 ## Status
 
-Versão atual: **0.1.0 — protótipo da linguagem**.
+Versão atual: **0.2.0 — fundação de gameplay 3D**.
 
-Já disponível: números, strings, booleanos, `nil`, variáveis (`auto`, `let`, `var`), operadores aritméticos e comparativos, `output`/`out`/`print`, comentários `//`, `sqrt`, REPL e execução de `.lgnd`.
+Disponível: lexer e parser, números, strings, booleanos, variáveis, operadores, `output`/`out`/`print`, tipos `vec2`, `vec3`, `quat`, `color`, `transform`, entidades, componentes, `spawn`, `add_component`, `set_transform`, `translate`, `entity_count`, corrotinas cooperativas com `yield`, cache de bytecode `.lbc` e hot reload com `--watch`.
 
-A sintaxe e a ABI ainda podem evoluir. Não é uma engine AAA e não deve ser usada em produção neste estágio.
+O runtime atual é uma fundação executável, não uma engine AAA pronta. Renderização, física e áudio ainda serão módulos nativos da plataforma.
 
-## Dependências
+## Instalação e compilação
 
-- Compilador com C++23: GCC, Clang ou MSVC
-- CMake 3.25 ou mais recente
-- Git
-
-## Compilar e instalar no Linux/macOS/BSD
+### Linux, macOS e BSD
 
 ```bash
 git clone https://github.com/beguagua/legend-script.git
@@ -28,15 +26,7 @@ cmake --build build
 sudo cmake --install build
 ```
 
-Assim como no Terlang, o comando instalado é `legend`.
-
-```bash
-legend --version
-legend examples/hello.lgnd
-legend -e 'output("Hello from Legend!")'
-```
-
-Para instalar em uma pasta local sem `sudo`:
+Para uma instalação local sem `sudo`:
 
 ```bash
 cmake -B build -DCMAKE_INSTALL_PREFIX="$HOME/.local"
@@ -44,9 +34,7 @@ cmake --build build
 cmake --install build
 ```
 
-## Windows com MSVC
-
-Abra o Developer PowerShell e execute:
+### Windows com MSVC
 
 ```powershell
 git clone https://github.com/beguagua/legend-script.git
@@ -55,37 +43,116 @@ cmake -B build .
 cmake --build build --config Release
 ```
 
-O binário fica em `build\Release\legend.exe`. Adicione essa pasta ao `PATH` ou copie o executável para um diretório já incluído no `PATH`.
+O executável ficará em `build\Release\legend.exe`.
 
 ## Primeiros passos
+
+Crie `hello.lgnd`:
 
 ```lgnd
 auto title = "Legend Script";
 auto damage = 12 * 3;
 output(title + " damage=" + damage);
-output(sqrt(81));
 output(damage > 30);
 ```
 
 Execute:
 
 ```bash
-legend examples/hello.lgnd
+legend hello.lgnd
+legend -e 'output("A new legend begins")'
 ```
 
-O REPL é iniciado sem argumentos. Digite `exit` para sair:
+Sem argumentos, o comando abre o REPL. Digite `exit` para sair.
 
-```text
-$ legend
-Legend Script v0.1.0
-legend> output("A new legend begins")
-A new legend begins
-legend> exit
+## Criando uma cena 3D
+
+Os tipos matemáticos são valores próprios da linguagem. Use coordenadas XYZ diretamente no código para posicionar objetos:
+
+```lgnd
+auto player = spawn("Player");
+auto position = vec3(0, 1.8, 0);
+auto rotation = quat(0, 0, 0, 1);
+auto scale = vec3(1, 1, 1);
+auto pose = transform(position, rotation, scale);
+
+add_component(player, "CharacterController");
+add_component(player, "Health(100)");
+set_transform(player, pose);
+translate(player, vec3(0, 0, -3));
+output(player);
 ```
 
-## Direção para jogos AAA
+### Tipos principais
 
-O plano é evoluir por camadas: um lexer/parser com diagnósticos ricos; tipos nativos de jogo (`vec2`, `vec3`, `quat`, `color`, `transform`); entidades e componentes; corrotinas para gameplay; hot reload; bindings para C++/C; compilação AOT e bytecode; e integração opcional com renderizadores e engines. O foco será manter scripts determinísticos, rápidos e seguros para times de gameplay.
+| Tipo | Uso |
+|---|---|
+| `vec2(x, y)` | Coordenadas 2D, UI e input |
+| `vec3(x, y, z)` | Posição, direção, escala e velocidade 3D |
+| `quat(x, y, z, w)` | Rotação sem gimbal lock |
+| `color(r, g, b, a)` | Cor linear/RGBA |
+| `transform(position, rotation, scale)` | Pose completa de um objeto |
+| `spawn("Name")` | Cria uma entidade no runtime |
+| `add_component(entity, "Type")` | Anexa um componente ao objeto |
+
+## Tutorial: primeiro protótipo de FPS
+
+O arquivo [`examples/fps_foundations.lgnd`](examples/fps_foundations.lgnd) demonstra a base de um FPS. O fluxo recomendado é:
+
+1. Crie o jogador com `spawn("Player")`.
+2. Adicione componentes de movimento e vida.
+3. Crie a câmera e a arma como entidades separadas.
+4. Use `vec3` para posicionar cada objeto em XYZ.
+5. Use `transform` para combinar posição, rotação e escala.
+6. Use `translate` para simular o movimento do jogador.
+7. Use `yield(0.016)` para entregar o controle ao scheduler no fim do frame.
+
+```bash
+legend examples/fps_foundations.lgnd
+```
+
+O próximo módulo do FPS adicionará input, colisão, raycast, meshes, materiais, animação e renderização. A linguagem manterá essas APIs de alto nível, enquanto o runtime poderá usar backends Vulkan, DirectX ou Metal.
+
+## Corrotinas
+
+Corrotinas permitem scripts de gameplay suspenderem sua execução sem bloquear o jogo:
+
+```lgnd
+output("opening door");
+yield(0.25);
+output("door opened");
+```
+
+O `yield` atual registra o ponto de espera no scheduler cooperativo. A futura versão do runtime usará esse mesmo contrato para sequências de animação, diálogos, streaming e IA.
+
+## Bytecode e hot reload
+
+Compile um script para o cache binário Legend:
+
+```bash
+legend --compile examples/fps_foundations.lgnd
+legend --bytecode examples/fps_foundations.lbc
+```
+
+O bytecode atual é um formato seguro e simples de cache do programa-fonte, criado para estabilizar a interface do pipeline. A próxima etapa substituirá o conteúdo pelo instruction set compacto e verificável da VM.
+
+Durante o desenvolvimento, observe um arquivo e recarregue-o quando ele mudar:
+
+```bash
+legend --watch examples/fps_foundations.lgnd
+```
+
+## IA local e arquivos GGUF
+
+A arquitetura prevê um módulo opcional `legend-ai` para NPCs inteligentes. Ele poderá carregar um arquivo `.gguf`, registrar um componente de agente e conversar com um backend baseado em `llama.cpp`. Essa integração será opt-in porque modelos GGUF são grandes e variam em licença, memória e hardware:
+
+```lgnd
+// API planejada — ainda não habilitada no runtime 0.2
+auto npc = spawn("Guard");
+add_component(npc, "DialogueAgent(model=guard.gguf)");
+```
+
+O projeto não baixa modelos nem compila `llama.cpp` automaticamente nesta versão. Isso evita downloads inesperados e permite que cada equipe escolha modelo, licença, quantização e backend.
 
 ## Testes
 
@@ -94,6 +161,12 @@ cmake -B build -DBUILD_TESTING=ON
 cmake --build build
 ctest --test-dir build --output-on-failure
 ```
+
+## Roadmap
+
+As próximas camadas são: VM de bytecode real e debugger; sistema de tipos estático opcional; renderização 3D e materiais; física e navegação; input e networking; hot reload de assets; bindings para Vulkan/DirectX/Metal; compilação AOT; editor visual; e módulo opcional de IA GGUF/llama.cpp.
+
+O objetivo é que iniciantes possam criar protótipos rapidamente e que equipes profissionais possam escalar o mesmo projeto sem trocar de linguagem.
 
 ## Licença
 

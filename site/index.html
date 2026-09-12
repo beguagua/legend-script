@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Legend Script — Crie mundos</title><meta name="description" content="Aprenda Legend Script criando jogos 2D e 3D.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="nav"><a class="brand" href="#top">LEGEND<span>■</span></a><nav><a href="#learn">Aprenda</a><a href="#fps">Crie um FPS</a><a href="#reference">Referência</a><a class="button small" href="https://github.com/beguagua/legend-script">GitHub</a></nav></header>
+<main id="top">
+<section class="hero"><div><p class="eyebrow">LEGEND SCRIPT 0.2</p><h1>Transforme uma ideia em um mundo jogável.</h1><p class="lead">Uma linguagem de gameplay para quem está começando e para equipes que precisam construir jogos ambiciosos. Escreva cenas, entidades e movimento 3D com código que parece linguagem humana.</p><div class="actions"><a class="button" href="#learn">Começar agora</a><a class="text-link" href="https://github.com/beguagua/legend-script">Ver o código →</a></div></div><pre class="code-card"><code><span class="muted">// seu primeiro objeto 3D</span>
+<span class="kw">auto</span> hero = <span class="fn">spawn</span>(<span class="str">"Hero"</span>);
+<span class="kw">auto</span> pos = <span class="fn">vec3</span>(<span class="num">0</span>, <span class="num">1.8</span>, <span class="num">0</span>);
+<span class="kw">auto</span> rot = <span class="fn">quat</span>(<span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>, <span class="num">1</span>);
+<span class="fn">set_transform</span>(hero, <span class="fn">transform</span>(pos, rot,
+  <span class="fn">vec3</span>(<span class="num">1</span>, <span class="num">1</span>, <span class="num">1</span>)));
+<span class="fn">output</span>(hero);</code></pre></section>
+<section class="stats"><div><strong>2D + 3D</strong><span>Do protótipo ao mundo</span></div><div><strong>.lgnd</strong><span>Simples de ler e versionar</span></div><div><strong>AAA + Indie</strong><span>Uma linguagem, qualquer escala</span></div></section>
+<section id="learn" class="section"><p class="eyebrow">APRENDA NO SEU RITMO</p><h2>Comece pequeno. Pense grande.</h2><div class="cards"><article><b>01</b><h3>Para qualquer pessoa</h3><p>Variáveis, objetos e coordenadas são apresentados com exemplos visuais. Não precisa saber C++ para começar.</p></article><article><b>02</b><h3>Faça coisas reais</h3><p>Crie entidades, adicione componentes, mova personagens e monte cenas com funções que expressam sua intenção.</p></article><article><b>03</b><h3>Cresça com o projeto</h3><p>Hot reload, bytecode, corrotinas e IA local formam a ponte entre seu primeiro protótipo e um jogo completo.</p></article></div></section>
+<section id="fps" class="dark-section"><div><p class="eyebrow">TUTORIAL GUIADO</p><h2>Seu primeiro FPS em 10 minutos.</h2><p>Comece pelo jogador, dê uma posição no espaço e adicione componentes. A linguagem cuida da complexidade repetitiva para você se concentrar no jogo.</p><a class="button" href="https://github.com/beguagua/legend-script/blob/main/README.md#tutorial-primeiro-prot%C3%B3tipo-de-fps">Abrir tutorial completo</a></div><pre class="code-card"><code><span class="kw">auto</span> player = <span class="fn">spawn</span>(<span class="str">"Player"</span>);
+<span class="fn">add_component</span>(player, <span class="str">"CharacterController"</span>);
+<span class="fn">add_component</span>(player, <span class="str">"Health(100)"</span>);
+<span class="fn">translate</span>(player, <span class="fn">vec3</span>(<span class="num">0</span>, <span class="num">0</span>, -<span class="num">3</span>));
+<span class="fn">output</span>(<span class="str">"Ready!"</span>);</code></pre></section>
+<section id="reference" class="section"><p class="eyebrow">CAIXA DE FERRAMENTAS</p><h2>Construído para o próximo passo.</h2><div class="reference"><div><h3>Tipos de mundo</h3><p><code>vec2</code> · <code>vec3</code> · <code>quat</code> · <code>color</code> · <code>transform</code></p></div><div><h3>Runtime</h3><p><code>spawn</code> · <code>add_component</code> · <code>translate</code> · <code>yield</code></p></div><div><h3>Pipeline</h3><p><code>--compile</code> · <code>--bytecode</code> · <code>--watch</code></p></div></div></section>
+<section class="cta"><h2>O próximo mundo pode ser seu.</h2><p>Baixe o código, abra um arquivo `.lgnd` e comece a construir.</p><a class="button" href="https://github.com/beguagua/legend-script#instala%C3%A7%C3%A3o-e-compila%C3%A7%C3%A3o">Instalar Legend Script</a></section>
+</main><footer><span>LEGEND SCRIPT</span><span>Open source · GPL-3.0</span></footer>
+</body></html>
