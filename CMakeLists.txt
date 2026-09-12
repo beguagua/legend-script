@@ -24,6 +24,8 @@ include(CTest)
 if(BUILD_TESTING)
   add_test(NAME legend_smoke COMMAND legend -e "output(2 + 3 * 4)")
   set_tests_properties(legend_smoke PROPERTIES PASS_REGULAR_EXPRESSION "14")
+  add_test(NAME legend_game_runtime COMMAND legend --run ${CMAKE_SOURCE_DIR}/examples/complete_game.lgnd)
+  set_tests_properties(legend_game_runtime PROPERTIES PASS_REGULAR_EXPRESSION "scene=arena")
 endif()
 
 add_custom_target(uninstall

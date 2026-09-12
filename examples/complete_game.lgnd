@@ -1,0 +1,17 @@
+// Vertical slice: cena, input, render, audio, colisao e frame loop
+auto current = scene("arena");
+auto player = spawn("Player");
+auto enemy = spawn("Enemy");
+add_component(player, "CharacterController");
+add_component(player, "Health(100)");
+add_component(enemy, "NavAgent");
+set_transform(player, transform(vec3(0, 1.8, 0), quat(0,0,0,1), vec3(1,1,1)));
+set_transform(enemy, transform(vec3(0, 0, -4), quat(0,0,0,1), vec3(1,1,1)));
+play_sound("music/arena.ogg");
+draw_mesh("player.mesh", player, "player.mat");
+draw_mesh("enemy.mesh", enemy, "enemy.mat");
+translate(player, vec3(input_axis("move_x") * delta_time(), 0, -delta_time()));
+output("scene=" + current_scene());
+output("entities=" + entity_count());
+output("near=" + collides(player, enemy));
+yield(0.016);

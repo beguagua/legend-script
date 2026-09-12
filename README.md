@@ -171,3 +171,30 @@ O objetivo é que iniciantes possam criar protótipos rapidamente e que equipes 
 ## Licença
 
 GPL-3.0. Consulte [LICENSE](LICENSE).
+
+
+## Runtime de jogo 0.3
+
+A versão 0.3 adiciona uma camada de runtime para construir um vertical slice jogável sem sair da Legend. Ela inclui cenas, entidades, componentes, input abstrato, colisão espacial básica, áudio, desenho de meshes, relógio de jogo e controle do ciclo de execução.
+
+```lgnd
+scene("arena");
+auto player = spawn("Player");
+auto enemy = spawn("Enemy");
+add_component(player, "CharacterController");
+add_component(enemy, "NavAgent");
+set_transform(player, transform(vec3(0, 1.8, 0), quat(0,0,0,1), vec3(1,1,1)));
+translate(player, vec3(input_axis("move_x") * delta_time(), 0, -delta_time()));
+draw_mesh("player.mesh", player, "player.mat");
+play_sound("music/arena.ogg");
+```
+
+APIs disponíveis nesta versão: `scene`, `current_scene`, `time`, `delta_time`, `input_pressed`, `input_axis`, `play_sound`, `draw_mesh`, `collides`, `log` e `quit`. Os backends reais de Vulkan/DirectX/Metal, áudio e input serão conectados ao mesmo contrato em módulos nativos posteriores; o runtime atual oferece uma implementação verificável e substituível para desenvolvimento da linguagem.
+
+Execute o exemplo completo:
+
+```bash
+legend --run examples/complete_game.lgnd
+```
+
+O objetivo da Legend é permitir que o mesmo código seja usado para protótipos indie, ferramentas internas e jogos AAA. Para isso, o projeto está sendo separado em uma linguagem expressiva, uma VM de bytecode, um runtime de entidades e componentes e backends de plataforma. A versão 0.3 é o primeiro vertical slice dessa arquitetura, não uma promessa de que renderização, física e networking de produção já estejam prontos.
