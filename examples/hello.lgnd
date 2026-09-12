@@ -1,0 +1,10 @@
+// First steps in Legend Script
+auto game = "Legend Quest";
+auto base_damage = 12;
+auto critical_multiplier = 2;
+auto critical_damage = base_damage * critical_multiplier;
+
+output("Loading " + game);
+output("Critical damage: " + critical_damage);
+output(sqrt(144));
+output(critical_damage > 20);
