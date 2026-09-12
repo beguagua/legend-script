@@ -198,3 +198,40 @@ legend --run examples/complete_game.lgnd
 ```
 
 O objetivo da Legend é permitir que o mesmo código seja usado para protótipos indie, ferramentas internas e jogos AAA. Para isso, o projeto está sendo separado em uma linguagem expressiva, uma VM de bytecode, um runtime de entidades e componentes e backends de plataforma. A versão 0.3 é o primeiro vertical slice dessa arquitetura, não uma promessa de que renderização, física e networking de produção já estejam prontos.
+
+
+## Backend OpenGL
+
+A Legend oferece um contrato de backend OpenGL para todas as versões desktop de **OpenGL 1.0 até OpenGL 4.6**. O runtime valida a versão solicitada e diferencia o perfil de compatibilidade do perfil core:
+
+```bash
+legend --opengl-version 1.0
+legend --opengl-version 2.1
+legend --opengl-version 3.3
+legend --opengl-version 4.6 core
+```
+
+O resultado informa a capacidade pedida, por exemplo `OpenGL 4.6 Core (core)`. OpenGL core exige 3.2 ou superior; versões antigas usam o perfil de compatibilidade. A criação real do contexto é responsabilidade do host de janela de cada plataforma — WGL no Windows, GLX/EGL no Linux e CGL no macOS — e o driver instalado ainda precisa oferecer a versão solicitada. A Legend não pode inventar suporte de hardware que o sistema não possui.
+
+O CMake tenta localizar o SDK OpenGL quando disponível:
+
+```bash
+cmake -B build -DLEGEND_ENABLE_OPENGL=ON .
+```
+
+Se o SDK não estiver instalado, a camada de negociação portátil continua compilando e os jogos podem selecionar um backend nativo posteriormente. Para builds sem qualquer integração gráfica:
+
+```bash
+cmake -B build -DLEGEND_ENABLE_OPENGL=OFF .
+```
+
+A API de alto nível de `draw_mesh`, materiais e cenas permanece independente do backend. Isso permite que o mesmo jogo use OpenGL 1.x/2.x em hardware antigo, OpenGL 3.3 para uma base ampla ou OpenGL 4.6 Core para recursos modernos.
+
+
+## Vídeo: gameplay em CPU/RAM
+
+Como o ambiente de demonstração não possui placa de vídeo disponível, executei o vertical slice `examples/complete_game.lgnd` em modo headless: o runtime processou entidades, cena, colisão, input, áudio e renderização abstrata em memória RAM, enquanto uma visualização 2D foi gravada para demonstrar o estado do jogo.
+
+[Baixar vídeo da execução em CPU/RAM](media/legend-cpu-ram-gameplay.mp4)
+
+Esse modo é útil para testes automatizados, servidores e CI. Não substitui um backend gráfico real para jogos AAA; em uma máquina com GPU, a mesma camada de gameplay poderá ser conectada ao OpenGL, Vulkan, DirectX ou Metal.
