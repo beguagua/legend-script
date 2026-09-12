@@ -14,6 +14,78 @@ Disponível: lexer e parser, números, strings, booleanos, variáveis, operadore
 
 O runtime atual é uma fundação executável, não uma engine AAA pronta. Renderização, física e áudio ainda serão módulos nativos da plataforma.
 
+## Compatibilidade mínima
+
+A plataforma mínima oficialmente suportada para compilar a Legend é **macOS 10.13.6 High Sierra**. O projeto usa somente ferramentas disponíveis nesse sistema: Apple Clang, libc++, CMake e Make. O padrão de linguagem do compilador é C++17 para preservar compatibilidade; C++23 não é necessário.
+
+No macOS 10.13.6:
+
+```bash
+./scripts/install-macos.sh
+lgnd --version
+```
+
+No Windows, o executável oficial é `lgnd.exe`. Ele deve ficar em `C:\Program Files\Legend\bin\lgnd.exe`. O instalador PowerShell cria as pastas e adiciona `bin` ao `PATH`:
+
+```powershell
+cmake -B build
+cmake --build build --config Release
+Set-ExecutionPolicy -Scope Process Bypass
+.\scripts\install-windows.ps1 -Binary .\build\Release\lgnd.exe
+```
+
+Depois de abrir um novo terminal, o comando global será:
+
+```powershell
+lgnd --version
+lgnd examples\complete_game.lgnd
+```
+
+## Compatibilidade mínima e execução pelo terminal
+
+A plataforma mínima oficialmente suportada para compilar a Legend é **macOS 10.13.6 High Sierra**. O projeto usa ferramentas disponíveis nesse sistema: Apple Clang, libc++, CMake e Make. O padrão de linguagem do compilador é C++17 para preservar compatibilidade; C++23 não é necessário.
+
+A Legend é iniciada pelo terminal em todos os sistemas operacionais. O comando oficial é sempre `lgnd`:
+
+| Sistema | Local do executável | Comando |
+|---|---|---|
+| Windows | `C:\Program Files\Legend\bin\lgnd.exe` | `lgnd` |
+| macOS 10.13.6+ | `/usr/local/bin/lgnd` | `lgnd` |
+| Linux/BSD | `/usr/local/bin/lgnd` | `lgnd` |
+
+No macOS:
+
+```bash
+./scripts/install-macos.sh
+lgnd --version
+lgnd examples/complete_game.lgnd
+```
+
+No Windows, compile e instale em `C:\Program Files\Legend\bin`:
+
+```powershell
+cmake -B build
+cmake --build build --config Release
+Set-ExecutionPolicy -Scope Process Bypass
+.\scripts\install-windows.ps1 -Binary .\build\Release\lgnd.exe
+```
+
+Depois de abrir um novo terminal, a pessoa não precisa abrir o `.exe` manualmente:
+
+```powershell
+lgnd --version
+lgnd examples\complete_game.lgnd
+```
+
+No Linux/BSD:
+
+```bash
+cmake -B build -DCMAKE_INSTALL_PREFIX=/usr/local
+cmake --build build
+sudo cmake --install build
+lgnd --version
+```
+
 ## Instalação e compilação
 
 ### Linux, macOS e BSD
@@ -60,7 +132,7 @@ Execute:
 
 ```bash
 legend hello.lgnd
-legend -e 'output("A new legend begins")'
+lgnd -e 'output("A new legend begins")'
 ```
 
 Sem argumentos, o comando abre o REPL. Digite `exit` para sair.
@@ -108,7 +180,7 @@ O arquivo [`examples/fps_foundations.lgnd`](examples/fps_foundations.lgnd) demon
 7. Use `yield(0.016)` para entregar o controle ao scheduler no fim do frame.
 
 ```bash
-legend examples/fps_foundations.lgnd
+lgnd examples/fps_foundations.lgnd
 ```
 
 O próximo módulo do FPS adicionará input, colisão, raycast, meshes, materiais, animação e renderização. A linguagem manterá essas APIs de alto nível, enquanto o runtime poderá usar backends Vulkan, DirectX ou Metal.
@@ -130,8 +202,8 @@ O `yield` atual registra o ponto de espera no scheduler cooperativo. A futura ve
 Compile um script para o cache binário Legend:
 
 ```bash
-legend --compile examples/fps_foundations.lgnd
-legend --bytecode examples/fps_foundations.lbc
+lgnd --compile examples/fps_foundations.lgnd
+lgnd --bytecode examples/fps_foundations.lbc
 ```
 
 O bytecode atual é um formato seguro e simples de cache do programa-fonte, criado para estabilizar a interface do pipeline. A próxima etapa substituirá o conteúdo pelo instruction set compacto e verificável da VM.
@@ -139,7 +211,7 @@ O bytecode atual é um formato seguro e simples de cache do programa-fonte, cria
 Durante o desenvolvimento, observe um arquivo e recarregue-o quando ele mudar:
 
 ```bash
-legend --watch examples/fps_foundations.lgnd
+lgnd --watch examples/fps_foundations.lgnd
 ```
 
 ## IA local e arquivos GGUF
@@ -194,7 +266,7 @@ APIs disponíveis nesta versão: `scene`, `current_scene`, `time`, `delta_time`,
 Execute o exemplo completo:
 
 ```bash
-legend --run examples/complete_game.lgnd
+lgnd --run examples/complete_game.lgnd
 ```
 
 O objetivo da Legend é permitir que o mesmo código seja usado para protótipos indie, ferramentas internas e jogos AAA. Para isso, o projeto está sendo separado em uma linguagem expressiva, uma VM de bytecode, um runtime de entidades e componentes e backends de plataforma. A versão 0.3 é o primeiro vertical slice dessa arquitetura, não uma promessa de que renderização, física e networking de produção já estejam prontos.
@@ -205,10 +277,10 @@ O objetivo da Legend é permitir que o mesmo código seja usado para protótipos
 A Legend oferece um contrato de backend OpenGL para todas as versões desktop de **OpenGL 1.0 até OpenGL 4.6**. O runtime valida a versão solicitada e diferencia o perfil de compatibilidade do perfil core:
 
 ```bash
-legend --opengl-version 1.0
-legend --opengl-version 2.1
-legend --opengl-version 3.3
-legend --opengl-version 4.6 core
+lgnd --opengl-version 1.0
+lgnd --opengl-version 2.1
+lgnd --opengl-version 3.3
+lgnd --opengl-version 4.6 core
 ```
 
 O resultado informa a capacidade pedida, por exemplo `OpenGL 4.6 Core (core)`. OpenGL core exige 3.2 ou superior; versões antigas usam o perfil de compatibilidade. A criação real do contexto é responsabilidade do host de janela de cada plataforma — WGL no Windows, GLX/EGL no Linux e CGL no macOS — e o driver instalado ainda precisa oferecer a versão solicitada. A Legend não pode inventar suporte de hardware que o sistema não possui.
